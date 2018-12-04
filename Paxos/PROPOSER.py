@@ -65,6 +65,27 @@ class PROPOSER:
 
 	def broadcast(self):
 		print('broadcast %s\n' % self.value)
+		f0 = open(r'C:\Python_WorkPlace\Paxos\learnerLog', 'r')
+		learnerArr = []
+		i = 0
+		i_tuple = [1]*2
+		for line in f0.readlines():
+			a = i_tuple[:]
+			if i == 2:
+				learnerArr.append(a)
+				i = 0
+			i_tuple[i] = line.strip()
+			i = i + 1
+		learnerArr.append(i_tuple)
+		f0.close()
+
+		for i in learnerArr:
+			message = {
+				'status': 'broadcast',
+				'value': self.value
+			}
+			message = json.dumps(message)
+			proposer.soc.sendto(message.encode('utf-8'), (i[0], int(i[1])))
 
 #initialize the Proposer program
 if len(sys.argv)==1:
@@ -73,7 +94,7 @@ else:
 	
 	#ip = '192.168.1.65'
 	#acceptors = [(ip, port) for port in range(65520, 65525)]
-	f = open('log', 'r')
+	f = open(r'C:\Python_WorkPlace\Paxos\log', 'r')
 	acceptors = []
 	i = 0
 	i_tuple = [1]*2
@@ -86,6 +107,9 @@ else:
 		i = i + 1
 	acceptors.append(i_tuple)
 	f.close()
+
+	for i in acceptors:
+		print("%s %s" % (i[0], i[1]))
 
 
 	proposer = PROPOSER(sys.argv[1], sys.argv[2], sys.argv[3], acceptors)	#ip and port
@@ -100,7 +124,8 @@ else:
 			message = {
 				'proposalID': proposer.proposalID,
 				'proposalValue': proposer.value,
-				'phase1Sign': proposer.phase1Sign
+				'phase1Sign': proposer.phase1Sign,
+				'stop': 'None'
 			}
 
 			message = json.dumps(message)
@@ -124,7 +149,6 @@ else:
 					print('^^^^^^^^^^^^^^^^^^^^ %s' % m['acceptStatus'])
 			except socket.error:
 				proposer.rejectCount = proposer.rejectCount + 1
-				pass
 				
 			
 
@@ -137,7 +161,8 @@ else:
 				message = {
 					'proposalID': proposer.proposalID,
 					'proposalValue': proposer.value,
-					'phase1Sign': proposer.phase1Sign
+					'phase1Sign': proposer.phase1Sign,
+					'stop': 'None'
 				}
 				message = json.dumps(message)
 				proposer.soc.sendto(message.encode('utf-8'), (server[0], server[1]))
@@ -145,9 +170,11 @@ else:
 			proposer.agreeCount, proposer.rejectCount = 0, 0
 
 			while (proposer.agreeCount <= proposer.halfNum) and (proposer.rejectCount <= proposer.halfNum):
-
+				print('-----------------------------')
+				
 				try: 
 					print('proposer.agreeCount = %d, proposer.rejectCount = %d' % (proposer.agreeCount, proposer.rejectCount))
+					proposer.soc.settimeout(15.00)
 					data, addr = proposer.soc.recvfrom(1024)
 					data = data.decode('utf-8')
 					m = json.loads(data)
@@ -157,6 +184,7 @@ else:
 						proposer.agreeCount = proposer.agreeCount + 1
 					elif m['acceptStatus'] == 3:
 						proposer.value = m['dicidedValue']
+						print('----------------------%s' % proposer.value)
 						proposer.agreeCount = proposer.agreeCount + 1
 					elif m['acceptStatus'] == 0:
 						proposer.rejectCount = proposer.rejectCount + 1
@@ -164,7 +192,11 @@ else:
 						print('&&&&&&&&&&&&&&&&&&& %s' % m['acceptStatus'])
 				except socket.error:
 					proposer.rejectCount = proposer.rejectCount + 1
-					pass
+				except socket.timeout:
+					proposer.agreeCount = 0
+					proposer.rejectCount = 0
+					break
+
 
 			if proposer.agreeCount > proposer.halfNum:
 				print("agreeCount: %s halfNum: %s" %(proposer.agreeCount, proposer.halfNum))
@@ -177,7 +209,4 @@ else:
 			print("Proposer whose ID is %s does not pass the first phase and need restart the first phase.\n" % proposer.proposalID)
 			proposer.agreeCount = 0
 			proposer.rejectCount = 0
-			while True:
-				proposer.proposalID = proposer.proposalID + random.randint(0,100)
-				if proposer.proposalID != m['proposalID']:
-					break
+			proposer.proposalID = proposer.proposalID + random.randint(0,100)

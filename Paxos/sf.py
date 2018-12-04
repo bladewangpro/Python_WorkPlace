@@ -16,13 +16,15 @@ class GUI:
 	def __init__(self):
 		self.root = Tk()
 		self.root.title('Paxos')
-		self.root.iconbitmap(r'1.ico')
+		#self.root.iconbitmap(r'C:\Python_WorkPlace\Paxos\1.ico')
 		self.root.geometry('300x200')
 		Label(self.root,text='\n\n\n').grid(row=1,column=0)
 		Label(self.root,text='      proposer amount:').grid(row=3,column=0)
 		Label(self.root,text='      acceptor amount:').grid(row=6,column=0)
+
 		self.e1 = Entry(self.root,textvariable=StringVar()) 
 		self.e2 = Entry(self.root,textvariable=StringVar())
+
 		self.e1.grid(row=3,column=1,padx=10,pady=5)
 		self.e2.grid(row=6,column=1,padx=10,pady=5)
 
@@ -35,6 +37,7 @@ class GUI:
 		self.acceptorPort = []
 		self.acceptorLoc = []
 
+
 		def enter():
 			
 
@@ -46,7 +49,7 @@ class GUI:
 
 			self.win0 = Tk()
 			self.win0.title('Proposers')
-			self.win0.iconbitmap(r'1.ico')
+			#self.win0.iconbitmap(r'C:\Python_WorkPlace\Paxos\1.ico')
 			self.win0.geometry('%s%s%s' % (str(800), 'x', str(self.num_proposers * 29 + 40)))
 			for i in range(0,int(self.e1.get())):
 				#IP
@@ -80,7 +83,7 @@ class GUI:
 				#next page
 				self.win1 = Tk()
 				self.win1.title('Acceptors')
-				self.win1.iconbitmap(r'1.ico')
+				#self.win1.iconbitmap(r'C:\Python_WorkPlace\Paxos\1.ico')
 				self.win1.geometry('%s%s%s' % (str(600), 'x', str(self.num_acceptors * 29 + 40)))
 
 				for i in range(0,int(self.e2.get())):
@@ -105,11 +108,12 @@ class GUI:
 						print('self.acceptorIP: %s' % self.acceptorIP[m])
 						print('self.acceptorPort: %s' % self.acceptorPort[m])
 						print('self.acceptorLoc: %s' % self.acceptorLoc[m])
-
+					
 					
 					self.root.destroy()
 					self.win0.destroy()
 					self.win1.destroy()
+					
 					
 				Button(self.win1,text='Go',width=10,command=submitAcc).grid(row=self.num_acceptors + 2 ,column=5,sticky=W,padx=10,pady=5)
 

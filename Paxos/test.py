@@ -18,6 +18,7 @@ import sf
 
 if __name__ == '__main__':
 
+	#os.system(r"start cmd /k python C:\Python_WorkPlace\Paxos\LEARNER.py 192.168.1.65 52322")
 	gui = sf.GUI()
 
 
@@ -56,6 +57,8 @@ if __name__ == '__main__':
 
 	for i in range(len(gui.proposerValue)):
 		os.system(r"start cmd /k python %s %s %s %s" % (gui.proposerLoc[i] ,gui.proposerValue[i], gui.proposerIP[i], gui.proposerPort[i]))
+
+
 
 	#os.system(r"start cmd /k python C:\Users\blade\Downloads\Paxos\PROPOSER.py %d %s %d" % (value[0], ip_proposer, a_p))
 	#a_p = a_p + 1

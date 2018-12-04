@@ -33,7 +33,8 @@ class ACCEPTOR:
 			data, addr = self.s.recvfrom(1024)
 			data =data.decode('utf-8')
 			result = json.loads(data)
-
+			#if result['stop'] == 'stop':
+			#	break
 			#debug
 			print('[phase1Sign: %s, proposalID: %s, proposalValue: %s]' % (result['phase1Sign'], result['proposalID'], result['proposalValue']))
 
