@@ -1,5 +1,5 @@
 """
-	@author: Tianyi Wang
+	@author: Tianyi Wang && Wensong Xiao
 
 	@file: PROPOSER.py
 
