@@ -50,6 +50,8 @@ class PROPOSER:
 		self.acceptorArray = []
 		self.halfNum = len(acceptors)/2
 
+		self.changingList = []
+
 	def stop(self):
 		self.run = False
 
@@ -183,7 +185,8 @@ else:
 					if m['acceptStatus'] == 2:
 						proposer.agreeCount = proposer.agreeCount + 1
 					elif m['acceptStatus'] == 3:
-						proposer.value = m['dicidedValue']
+						#proposer.value = m['dicidedValue']
+						proposer.changingList.append(m['dicidedValue'])
 						print('----------------------%s' % proposer.value)
 						proposer.agreeCount = proposer.agreeCount + 1
 					elif m['acceptStatus'] == 0:
@@ -200,9 +203,16 @@ else:
 
 			if proposer.agreeCount > proposer.halfNum:
 				print("agreeCount: %s halfNum: %s" %(proposer.agreeCount, proposer.halfNum))
+				print('len(proposer.changingList = %d): ' % len(proposer.changingList))
+				if len(proposer.changingList) != 0:
+					dic = {}
+					for k in proposer.changingList:
+						dic[k] = dic.get(k, 0) + 1
+					proposer.value = sorted(dic.keys(), reverse = True)[0]
 				proposer.broadcast()
 			else:
 				proposer.phase1Sign = 0
+			proposer.changingList = []
 			proposer.acceptorArray = []
 
 		else:
